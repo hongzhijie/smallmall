@@ -1,7 +1,7 @@
-package com.smallmall.dao;
+package com.smallmall.dao.goods;
 
-import com.smallmall.model.LitemallGoods;
-import com.smallmall.model.LitemallGoodsExample;
+import com.smallmall.model.goods.LitemallGoods;
+import com.smallmall.model.goods.LitemallGoodsExample;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

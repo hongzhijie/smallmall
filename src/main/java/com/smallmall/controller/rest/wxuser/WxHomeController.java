@@ -1,36 +1,38 @@
-package com.smallmall.controller.rest.homepage;
+package com.smallmall.controller.rest.wxuser;
 
+import com.smallmall.controller.annotation.LoginUser;
 import com.smallmall.model.LitemallCategory;
-import com.smallmall.model.LitemallGoods;
-import com.smallmall.service.LitemallAdService;
-import com.smallmall.service.LitemallCategoryService;
-import com.smallmall.service.LitemallCouponService;
-import com.smallmall.service.LitemallGoodsService;
+import com.smallmall.model.goods.LitemallGoods;
+import com.smallmall.service.*;
+import com.smallmall.service.goods.LitemallGoodsService;
 import com.smallmall.utils.ResponseUtil;
+import com.smallmall.utils.SystemConfig;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /*
  * @Author hzj
- * @ClassName HomeRest
+ * @ClassName WxHomeController
  * @Description 小程序首页相关接口
- * @Date 17:06 2019/3/27
+ * @Date 15:58 2019/3/28
  **/
 @RestController
-@RequestMapping("ws/homePage")
-public class HomeRest {
+@RequestMapping("wx/home")
+@Validated
+public class WxHomeController {
+    private final Log logger = LogFactory.getLog(WxHomeController.class);
 
     @Autowired
     private LitemallAdService adService;
@@ -39,10 +41,36 @@ public class HomeRest {
     private LitemallGoodsService goodsService;
 
     @Autowired
+    private LitemallBrandService brandService;
+
+    @Autowired
+    private LitemallTopicService topicService;
+
+    @Autowired
     private LitemallCategoryService categoryService;
 
     @Autowired
+    private LitemallGrouponRulesService grouponRulesService;
+
+    @Autowired
     private LitemallCouponService couponService;
+
+    private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
+
+    private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
+
+    private static ThreadPoolExecutor executorService = new ThreadPoolExecutor(9, 9, 1000, TimeUnit.MILLISECONDS, WORK_QUEUE, HANDLER);
+
+    @GetMapping("/cache")
+    public Object cache(@NotNull String key) {
+        if (!key.equals("litemall_cache")) {
+            return ResponseUtil.fail();
+        }
+
+        // 清除缓存
+        HomeCacheManager.clearAll();
+        return ResponseUtil.ok("缓存已清除");
+    }
 
     /**
      * 首页数据
@@ -50,12 +78,19 @@ public class HomeRest {
      * @return 首页数据
      */
     @GetMapping("/index")
-    @ResponseBody
-    public Object index(Integer userId) {
+    public Object index(@LoginUser Integer userId) {
+        //优先从缓存中读取
+        if (HomeCacheManager.hasData(HomeCacheManager.INDEX)) {
+            return ResponseUtil.ok(HomeCacheManager.getCacheData(HomeCacheManager.INDEX));
+        }
         ExecutorService executorService = Executors.newFixedThreadPool(10);
+
         Map<String, Object> data = new HashMap<>();
+
         Callable<List> bannerListCallable = () -> adService.queryIndex();
+
         Callable<List> channelListCallable = () -> categoryService.queryChannel();
+
         Callable<List> couponListCallable;
         if(userId == null){
             couponListCallable = () -> couponService.queryList(0, 3);
@@ -64,16 +99,16 @@ public class HomeRest {
         }
 
 
-        Callable<List> newGoodsListCallable = () -> goodsService.queryByNew(0, 6);
+        Callable<List> newGoodsListCallable = () -> goodsService.queryByNew(0, SystemConfig.getNewLimit());
 
-        Callable<List> hotGoodsListCallable = () -> goodsService.queryByHot(0, 6);
+        Callable<List> hotGoodsListCallable = () -> goodsService.queryByHot(0, SystemConfig.getHotLimit());
 
-//        Callable<List> brandListCallable = () -> brandService.queryVO(0, 4);
+        Callable<List> brandListCallable = () -> brandService.queryVO(0, SystemConfig.getBrandLimit());
 
-//        Callable<List> topicListCallable = () -> topicService.queryList(0, 4);
+        Callable<List> topicListCallable = () -> topicService.queryList(0, SystemConfig.getTopicLimit());
 
         //团购专区
-//        Callable<List> grouponListCallable = () -> grouponRulesService.queryList(0, 5);
+        Callable<List> grouponListCallable = () -> grouponRulesService.queryList(0, 5);
 
         Callable<List> floorGoodsListCallable = this::getCategoryList;
 
@@ -82,9 +117,9 @@ public class HomeRest {
         FutureTask<List> couponListTask = new FutureTask<>(couponListCallable);
         FutureTask<List> newGoodsListTask = new FutureTask<>(newGoodsListCallable);
         FutureTask<List> hotGoodsListTask = new FutureTask<>(hotGoodsListCallable);
-//        FutureTask<List> brandListTask = new FutureTask<>(brandListCallable);
-//        FutureTask<List> topicListTask = new FutureTask<>(topicListCallable);
-//        FutureTask<List> grouponListTask = new FutureTask<>(grouponListCallable);
+        FutureTask<List> brandListTask = new FutureTask<>(brandListCallable);
+        FutureTask<List> topicListTask = new FutureTask<>(topicListCallable);
+        FutureTask<List> grouponListTask = new FutureTask<>(grouponListCallable);
         FutureTask<List> floorGoodsListTask = new FutureTask<>(floorGoodsListCallable);
 
         executorService.submit(bannerTask);
@@ -92,9 +127,9 @@ public class HomeRest {
         executorService.submit(couponListTask);
         executorService.submit(newGoodsListTask);
         executorService.submit(hotGoodsListTask);
-//        executorService.submit(brandListTask);
-//        executorService.submit(topicListTask);
-//        executorService.submit(grouponListTask);
+        executorService.submit(brandListTask);
+        executorService.submit(topicListTask);
+        executorService.submit(grouponListTask);
         executorService.submit(floorGoodsListTask);
 
         try {
@@ -103,22 +138,23 @@ public class HomeRest {
             data.put("couponList", couponListTask.get());
             data.put("newGoodsList", newGoodsListTask.get());
             data.put("hotGoodsList", hotGoodsListTask.get());
-            data.put("brandList", "");
-            data.put("topicList", "");
-            data.put("grouponList", "");
+            data.put("brandList", brandListTask.get());
+            data.put("topicList", topicListTask.get());
+            data.put("grouponList", grouponListTask.get());
             data.put("floorGoodsList", floorGoodsListTask.get());
         }
         catch (Exception e) {
             e.printStackTrace();
         }
         //缓存数据
+        HomeCacheManager.loadData(HomeCacheManager.INDEX, data);
         executorService.shutdown();
         return ResponseUtil.ok(data);
     }
 
     private List<Map> getCategoryList() {
         List<Map> categoryList = new ArrayList<>();
-        List<LitemallCategory> catL1List = categoryService.queryL1WithoutRecommend(0,4);
+        List<LitemallCategory> catL1List = categoryService.queryL1WithoutRecommend(0, SystemConfig.getCatlogListLimit());
         for (LitemallCategory catL1 : catL1List) {
             List<LitemallCategory> catL2List = categoryService.queryByPid(catL1.getId());
             List<Integer> l2List = new ArrayList<>();
@@ -130,7 +166,7 @@ public class HomeRest {
             if (l2List.size() == 0) {
                 categoryGoods = new ArrayList<>();
             } else {
-                categoryGoods = goodsService.queryByCategory(l2List, 0,4);
+                categoryGoods = goodsService.queryByCategory(l2List, 0, SystemConfig.getCatlogMoreLimit());
             }
 
             Map<String, Object> catGoods = new HashMap<>();

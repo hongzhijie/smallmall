@@ -1,4 +1,4 @@
-package com.smallmall.model;
+package com.smallmall.model.goods;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

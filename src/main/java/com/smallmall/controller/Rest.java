@@ -2,11 +2,10 @@ package com.smallmall.controller;
 
 
 import com.smallmall.model.Param;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+
 import javax.servlet.http.HttpServletRequest;
 
 /*
@@ -31,6 +30,6 @@ public class Rest {
 		param.setVersion(request.getParameter("version"));
 		//放入到request里面，这样后面的链接可以获取到
 		request.setAttribute("param", param);
-		return new ModelAndView("forward:/ws/" + param.getCmd());
+		return new ModelAndView("forward:/wx/" + param.getCmd());
     }
 }

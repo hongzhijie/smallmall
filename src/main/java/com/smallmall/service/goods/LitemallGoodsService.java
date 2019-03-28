@@ -1,22 +1,21 @@
-package com.smallmall.service;
+package com.smallmall.service.goods;
 
 import com.github.pagehelper.PageHelper;
-import com.smallmall.dao.LitemallGoodsMapper;
-import com.smallmall.model.LitemallGoods;
-import com.smallmall.model.LitemallGoods.Column;
-import com.smallmall.model.LitemallGoodsExample;
+import com.smallmall.dao.goods.LitemallGoodsMapper;
+import com.smallmall.model.goods.LitemallGoods;
+import com.smallmall.model.goods.LitemallGoods.Column;
+import com.smallmall.model.goods.LitemallGoodsExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class LitemallGoodsService {
-    Column[] columns = new Column[]{Column.id, Column.name, Column.brief, Column.picUrl, Column.isHot, Column.isNew, Column.counterPrice, LitemallGoods.Column.retailPrice};
+    Column[] columns = new Column[]{Column.id, Column.name, Column.brief, Column.picUrl, Column.isHot, Column.isNew, Column.counterPrice, Column.retailPrice};
     @Autowired
     private LitemallGoodsMapper goodsMapper;
 
