@@ -1,13 +1,14 @@
 package com.smallmall.utils;
 
 import cn.binarywang.wx.miniapp.api.WxMaService;
+import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
 import cn.binarywang.wx.miniapp.bean.WxMaTemplateMessage;
 import com.smallmall.model.LitemallUserFormid;
 import com.smallmall.service.LitemallUserFormIdService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import cn.binarywang.wx.miniapp.bean.WxMaTemplateData;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
  * 微信模版消息通知
  */
 public class WxTemplateSender {
-    private final Log logger = LogFactory.getLog(WxTemplateSender.class);
+    private static final Logger logger = LogManager.getLogger(WxTemplateSender.class);
 
     @Autowired
     private WxMaService wxMaService;

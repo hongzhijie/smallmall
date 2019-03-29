@@ -1,5 +1,6 @@
 package com.smallmall.controller.rest.wxuser;
 
+import com.smallmall.config.TaskExecutePool;
 import com.smallmall.controller.annotation.LoginUser;
 import com.smallmall.model.LitemallCategory;
 import com.smallmall.model.goods.LitemallGoods;
@@ -7,8 +8,6 @@ import com.smallmall.service.*;
 import com.smallmall.service.goods.LitemallGoodsService;
 import com.smallmall.utils.ResponseUtil;
 import com.smallmall.utils.SystemConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.FutureTask;
 
 /*
  * @Author hzj
@@ -32,7 +33,6 @@ import java.util.concurrent.*;
 @RequestMapping("wx/home")
 @Validated
 public class WxHomeController {
-    private final Log logger = LogFactory.getLog(WxHomeController.class);
 
     @Autowired
     private LitemallAdService adService;
@@ -55,11 +55,7 @@ public class WxHomeController {
     @Autowired
     private LitemallCouponService couponService;
 
-    private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
-
-    private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
-
-    private static ThreadPoolExecutor executorService = new ThreadPoolExecutor(9, 9, 1000, TimeUnit.MILLISECONDS, WORK_QUEUE, HANDLER);
+    private ExecutorService executorService = new TaskExecutePool().executorService();
 
     @GetMapping("/cache")
     public Object cache(@NotNull String key) {
@@ -83,7 +79,6 @@ public class WxHomeController {
         if (HomeCacheManager.hasData(HomeCacheManager.INDEX)) {
             return ResponseUtil.ok(HomeCacheManager.getCacheData(HomeCacheManager.INDEX));
         }
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
 
         Map<String, Object> data = new HashMap<>();
 

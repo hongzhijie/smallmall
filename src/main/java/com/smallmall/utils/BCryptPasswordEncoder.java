@@ -14,9 +14,8 @@ package com.smallmall.utils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.security.SecureRandom;
 import java.util.regex.Pattern;
@@ -30,7 +29,7 @@ import java.util.regex.Pattern;
  * @author Dave Syer
  */
 public class BCryptPasswordEncoder {
-    private final Log logger = LogFactory.getLog(getClass());
+    private final Logger logger = LogManager.getLogger(BCryptPasswordEncoder.class);
     private final int strength;
     private final SecureRandom random;
     private Pattern BCRYPT_PATTERN = Pattern
@@ -75,12 +74,12 @@ public class BCryptPasswordEncoder {
 
     public boolean matches(CharSequence rawPassword, String encodedPassword) {
         if (encodedPassword == null || encodedPassword.length() == 0) {
-            logger.warn("Empty encoded password");
+            logger.error("Empty encoded password");
             return false;
         }
 
         if (!BCRYPT_PATTERN.matcher(encodedPassword).matches()) {
-            logger.warn("Encoded password does not look like BCrypt");
+            logger.error("Encoded password does not look like BCrypt");
             return false;
         }
 

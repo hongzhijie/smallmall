@@ -9,8 +9,6 @@ import com.smallmall.model.UserToken;
 import com.smallmall.model.WxLoginInfo;
 import com.smallmall.service.*;
 import com.smallmall.utils.*;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +30,6 @@ import static com.smallmall.utils.WxResponseCode.*;
 @RestController
 @RequestMapping("wx/userAuth")
 public class WxAuthRest {
-    private final Log logger = LogFactory.getLog(WxAuthRest.class);
 
     @Autowired
     private LitemallUserService userService;

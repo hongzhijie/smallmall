@@ -3,8 +3,6 @@ package com.smallmall.controller.rest.wxuser;
 import com.smallmall.controller.annotation.LoginUser;
 import com.smallmall.service.LitemallOrderService;
 import com.smallmall.utils.ResponseUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,7 +19,6 @@ import java.util.Map;
 @RequestMapping("wx/user")
 @Validated
 public class WxUserRest {
-    private final Log logger = LogFactory.getLog(WxUserRest.class);
 
     @Autowired
     private LitemallOrderService orderService;

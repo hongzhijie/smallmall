@@ -2,6 +2,7 @@ package com.smallmall.controller.rest.wxuser;
 
 import com.github.pagehelper.PageInfo;
 import com.mysql.jdbc.StringUtils;
+import com.smallmall.config.TaskExecutePool;
 import com.smallmall.controller.annotation.LoginUser;
 import com.smallmall.model.LitemallBrand;
 import com.smallmall.model.LitemallCategory;
@@ -19,8 +20,6 @@ import com.smallmall.utils.Order;
 import com.smallmall.utils.ResponseUtil;
 import com.smallmall.utils.Sort;
 import com.smallmall.utils.SystemConfig;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +32,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 商品服务
@@ -42,7 +43,8 @@ import java.util.concurrent.*;
 @RequestMapping("wx/goods")
 @Validated
 public class WxGoodsRest {
-    private final Log logger = LogFactory.getLog(WxGoodsRest.class);
+
+    private ThreadPoolExecutor threadPoolExecutor = new TaskExecutePool().threadPoolExecutor();
 
     @Autowired
     private LitemallGoodsService goodsService;
@@ -83,11 +85,6 @@ public class WxGoodsRest {
     @Autowired
     private LitemallGrouponRulesService rulesService;
 
-    private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
-
-    private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
-
-    private static ThreadPoolExecutor executorService = new ThreadPoolExecutor(16, 16, 1000, TimeUnit.MILLISECONDS, WORK_QUEUE, HANDLER);
 
     /**
      * 商品详情
@@ -161,7 +158,7 @@ public class WxGoodsRest {
 
         // 记录用户的足迹 异步处理
         if (userId != null) {
-            executorService.execute(()->{
+            threadPoolExecutor.execute(()->{
                 LitemallFootprint footprint = new LitemallFootprint();
                 footprint.setUserId(userId);
                 footprint.setGoodsId(id);
@@ -176,13 +173,13 @@ public class WxGoodsRest {
         FutureTask<LitemallBrand> brandCallableTask = new FutureTask<>(brandCallable);
         FutureTask<List> grouponRulesCallableTask = new FutureTask<>(grouponRulesCallable);
 
-        executorService.submit(goodsAttributeListTask);
-        executorService.submit(objectCallableTask);
-        executorService.submit(productListCallableTask);
-        executorService.submit(issueCallableTask);
-        executorService.submit(commentsCallableTsk);
-        executorService.submit(brandCallableTask);
-        executorService.submit(grouponRulesCallableTask);
+        threadPoolExecutor.submit(goodsAttributeListTask);
+        threadPoolExecutor.submit(objectCallableTask);
+        threadPoolExecutor.submit(productListCallableTask);
+        threadPoolExecutor.submit(issueCallableTask);
+        threadPoolExecutor.submit(commentsCallableTsk);
+        threadPoolExecutor.submit(brandCallableTask);
+        threadPoolExecutor.submit(grouponRulesCallableTask);
 
         Map<String, Object> data = new HashMap<>();
 

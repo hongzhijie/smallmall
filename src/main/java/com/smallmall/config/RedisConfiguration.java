@@ -34,8 +34,6 @@ package com.smallmall.config;
 
 import com.smallmall.utils.JedisProperties;
 import com.smallmall.utils.RedisClient;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -53,9 +51,6 @@ import redis.clients.jedis.JedisPoolConfig;
 @ConditionalOnClass(RedisClient.class)//判断这个类是否在classpath中存在
 public class RedisConfiguration {
 
-    private Logger log = LogManager.getLogger(RedisConfiguration.class);
-
-
     @Bean(name="jedisPool")
     public JedisPool jedisPool() {
         JedisPoolConfig config = new JedisPoolConfig();
@@ -69,7 +64,7 @@ public class RedisConfiguration {
     @Bean
     @ConditionalOnMissingBean(RedisClient.class) //容器中如果没有RedisClient这个类,那么自动配置这个RedisClient
     public RedisClient redisClient(@Qualifier("jedisPool") JedisPool pool) {
-        log.info("初始化……Redis Client==Host={},Port={}", JedisProperties.host, JedisProperties.port);
+//        log.info("初始化……Redis Client==Host={},Port={}", JedisProperties.host, JedisProperties.port);
         RedisClient redisClient = new RedisClient();
         redisClient.setJedisPool(pool);
         return redisClient;

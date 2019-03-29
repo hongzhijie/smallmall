@@ -33,8 +33,8 @@
 package com.smallmall.utils;
 
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -45,7 +45,7 @@ import redis.clients.jedis.JedisPool;
  */
 public class RedisClient {
 
-    private Logger log = LogManager.getLogger(RedisClient.class);
+    private final Log log = LogFactory.getLog(RedisClient.class);
 
     private JedisPool jedisPool;
 

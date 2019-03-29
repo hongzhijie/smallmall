@@ -4,8 +4,6 @@ import com.smallmall.model.LitemallCategory;
 import com.smallmall.service.HomeCacheManager;
 import com.smallmall.service.LitemallCategoryService;
 import com.smallmall.utils.ResponseUtil;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +22,6 @@ import java.util.Map;
 @RequestMapping("wx/catalog")
 @Validated
 public class WxCatalogRest {
-    private final Log logger = LogFactory.getLog(WxCatalogRest.class);
 
     @Autowired
     private LitemallCategoryService categoryService;
