@@ -20,7 +20,16 @@ public class TaskExecutePool {
 
     private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
 
+    // 拒绝策略 abortPolicy callerRunsPolicy discardOldestPolicy discardPolicy
     private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
+
+    private static int corePoolSize = 4;//线程池维护线程的最少数量
+
+    private static int maxPoolSize = 8;//线程池维护线程的最大数量
+
+    private static long keepAliveTime=1000; //非核心线程的闲置超时时间，超过这个时间就会被回收。
+
+    private static TimeUnit  unit = TimeUnit.MILLISECONDS;//指定keepAliveTime的单位
     
     /*
      * @Author hzj
@@ -86,8 +95,8 @@ public class TaskExecutePool {
 
     @Bean
     public ThreadPoolExecutor threadPoolExecutor() {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(16, 16, 1000,
-                TimeUnit.MILLISECONDS, WORK_QUEUE, HANDLER);
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
+                unit, WORK_QUEUE, HANDLER);
         return threadPoolExecutor;
     }
 
