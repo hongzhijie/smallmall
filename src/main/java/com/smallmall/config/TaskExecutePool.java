@@ -20,7 +20,7 @@ public class TaskExecutePool {
 
     private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
 
-    private final static RejectedExecutionHandler HANDLER = new java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy();
+    private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
     
     /*
      * @Author hzj
