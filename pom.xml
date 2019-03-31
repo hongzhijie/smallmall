@@ -10,10 +10,10 @@
     </parent>
     <groupId>com.smallmall</groupId>
     <artifactId>smallmall</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <!--<version></version>-->
     <name>smallmall</name>
     <description>Demo project for Spring Boot</description>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <java.version>1.8</java.version>
@@ -21,10 +21,6 @@
     </properties>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>org.springframework.boot</groupId>-->
-            <!--<artifactId>spring-boot-starter-thymeleaf</artifactId>-->
-        <!--</dependency>-->
         <!-- web容器 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -65,12 +61,6 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- 连接池 -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>1.0.25</version>
-        </dependency>
         <!-- spring-boot整合 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -101,26 +91,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-jcl</artifactId>
-            <version>2.7</version>
-        </dependency>
 
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.3.5</version>
-        </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
             <version>3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>3.11</version>
         </dependency>
         <!-- cache缓存 -->
         <dependency>
@@ -136,12 +111,6 @@
             <version>4.5.2</version>
         </dependency>
 
-        <!-- JSONObject对象依赖的jar包 -->
-        <dependency>
-            <groupId>commons-beanutils</groupId>
-            <artifactId>commons-beanutils</artifactId>
-            <version>1.9.3</version>
-        </dependency>
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
@@ -208,11 +177,6 @@
             <artifactId>backport-util-concurrent</artifactId>
             <version>3.1</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.tomcat</groupId>-->
-            <!--<artifactId>tomcat-util</artifactId>-->
-            <!--<version>9.0-SNAPSHOT</version>-->
-        <!--</dependency>-->
 
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
@@ -228,12 +192,21 @@
     </dependencies>
 
     <build>
+        <finalName>smallmall</finalName>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
+                    <executable>true</executable>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <skip>true</skip>
+                    <testFailureIgnore>true</testFailureIgnore>
                 </configuration>
             </plugin>
         </plugins>
