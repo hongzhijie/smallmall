@@ -1,10 +1,11 @@
 package com.smallmall.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableAsync;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /*
  * @Author hzj
@@ -15,7 +16,7 @@ import java.util.concurrent.*;
  * @return
  **/
 @Configuration
-@EnableAsync
+//@EnableAsync
 public class TaskExecutePool {
 
     private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
@@ -93,18 +94,18 @@ public class TaskExecutePool {
 //        }
 //    }
 
-    @Bean
-    public ThreadPoolExecutor threadPoolExecutor() {
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
-                unit, WORK_QUEUE, HANDLER);
-        return threadPoolExecutor;
-    }
-
-    @Bean
-    public ExecutorService executorService() {
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        return executorService;
-    }
+//    @Bean
+//    public ThreadPoolExecutor threadPoolExecutor() {
+//        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, keepAliveTime,
+//                unit, WORK_QUEUE, HANDLER);
+//        return threadPoolExecutor;
+//    }
+//
+//    @Bean
+//    public ExecutorService executorService() {
+//        ExecutorService executorService = Executors.newFixedThreadPool(10);
+//        return executorService;
+//    }
 
 
 }
