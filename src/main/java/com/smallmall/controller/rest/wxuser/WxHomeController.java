@@ -1,6 +1,5 @@
 package com.smallmall.controller.rest.wxuser;
 
-import com.smallmall.config.TaskExecutePool;
 import com.smallmall.controller.annotation.LoginUser;
 import com.smallmall.model.LitemallCategory;
 import com.smallmall.model.goods.LitemallGoods;
@@ -19,9 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.*;
 
 /*
  * @Author hzj
@@ -55,7 +52,11 @@ public class WxHomeController {
     @Autowired
     private LitemallCouponService couponService;
 
-    private ExecutorService executorService = new TaskExecutePool().executorService();
+    private final static ArrayBlockingQueue<Runnable> WORK_QUEUE = new ArrayBlockingQueue<>(9);
+
+    private final static RejectedExecutionHandler HANDLER = new ThreadPoolExecutor.CallerRunsPolicy();
+
+    private static ThreadPoolExecutor executorService = new ThreadPoolExecutor(9, 9, 1000, TimeUnit.MILLISECONDS, WORK_QUEUE, HANDLER);
 
     @GetMapping("/cache")
     public Object cache(@NotNull String key) {
