@@ -1,5 +1,7 @@
 package com.smallmall.service;
 
+import org.springframework.stereotype.Component;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,6 +9,7 @@ import java.util.Map;
 /**
  * 简单缓存的数据
  */
+@Component  //这样的话 就是单例的了！！！注入到容器里面
 public class HomeCacheManager {
     public static final boolean ENABLE = false;
     public static final String INDEX = "index";
